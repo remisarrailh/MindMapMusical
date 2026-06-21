@@ -7,12 +7,14 @@ interface Props {
   styles: Style[]
   /** Index de la vidéo à ouvrir d'emblée (depuis le bouton ▶), sinon null. */
   initialVideo?: number | null
+  /** Affiche les actions Éditer/Supprimer uniquement en mode édition. */
+  editable?: boolean
   onEdit: (band: Band) => void
   onDelete: (band: Band) => void
   onClose: () => void
 }
 
-export default function BandDetailPanel({ band, styles, initialVideo, onEdit, onDelete, onClose }: Props) {
+export default function BandDetailPanel({ band, styles, initialVideo, editable, onEdit, onDelete, onClose }: Props) {
   const [openVideo, setOpenVideo] = useState<number | null>(initialVideo ?? null)
   const styleLabel = (id: string) => styles.find((s) => s.id === id)?.label ?? id
 
@@ -81,14 +83,16 @@ export default function BandDetailPanel({ band, styles, initialVideo, onEdit, on
         </section>
       )}
 
-      <div className="panel-actions">
-        <button className="btn" onClick={() => onEdit(band)}>
-          ✎ Éditer
-        </button>
-        <button className="btn btn-danger" onClick={() => onDelete(band)}>
-          🗑 Supprimer
-        </button>
-      </div>
+      {editable && (
+        <div className="panel-actions">
+          <button className="btn" onClick={() => onEdit(band)}>
+            ✎ Éditer
+          </button>
+          <button className="btn btn-danger" onClick={() => onDelete(band)}>
+            🗑 Supprimer
+          </button>
+        </div>
+      )}
     </aside>
   )
 }

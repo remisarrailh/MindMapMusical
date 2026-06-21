@@ -7,12 +7,13 @@ interface Props {
   onSearch: (s: string) => void
   styleFilter: string | null
   onStyleFilter: (id: string | null) => void
+  editMode: boolean
+  onToggleEdit: () => void
   onAdd: () => void
   onManageStyles: () => void
   onExport: () => void
   onImport: (db: BandDatabase) => void
-  onReset: () => void
-  hasUnexported: boolean
+  onResetPositions: () => void
   count: number
 }
 
@@ -22,12 +23,13 @@ export default function Toolbar({
   onSearch,
   styleFilter,
   onStyleFilter,
+  editMode,
+  onToggleEdit,
   onAdd,
   onManageStyles,
   onExport,
   onImport,
-  onReset,
-  hasUnexported,
+  onResetPositions,
   count,
 }: Props) {
   const fileRef = useRef<HTMLInputElement>(null)
@@ -49,15 +51,8 @@ export default function Toolbar({
     reader.readAsText(file)
   }
 
-  const reset = () => {
-    if (hasUnexported && !confirm('Des modifications locales ne sont pas exportées. Vider quand même ?')) {
-      return
-    }
-    onReset()
-  }
-
   return (
-    <header className="toolbar">
+    <header className={`toolbar${editMode ? ' toolbar--edit' : ''}`}>
       <div className="toolbar-brand">
         🎸 <strong>MindMap Musical</strong>
         <span className="toolbar-sub">Montpellier · {count} groupes</span>
@@ -85,29 +80,41 @@ export default function Toolbar({
       </div>
 
       <div className="toolbar-actions">
-        <button className="btn btn-primary" onClick={onAdd}>+ Groupe</button>
-        <button className="btn" onClick={onManageStyles} title="Gérer les styles et leurs couleurs">
-          🎨 Styles
+        <button
+          className={`btn${editMode ? ' btn-primary' : ''}`}
+          onClick={onToggleEdit}
+          title={editMode ? 'Quitter le mode édition' : 'Activer le mode édition'}
+        >
+          {editMode ? '✓ Terminer' : '✏️ Éditer'}
         </button>
-        <button className="btn" onClick={onExport} title="Télécharger bands.json à committer">
-          ⬇ Export{hasUnexported ? ' *' : ''}
-        </button>
-        <button className="btn" onClick={() => fileRef.current?.click()} title="Charger un bands.json">
-          ⬆ Import
-        </button>
-        <button className="btn" onClick={reset} title="Vider les modifications locales">
-          ↺ Reset local
-        </button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="application/json"
-          hidden
-          onChange={(e) => {
-            handleFile(e.target.files?.[0])
-            e.target.value = ''
-          }}
-        />
+
+        {editMode && (
+          <>
+            <button className="btn" onClick={onAdd}>+ Groupe</button>
+            <button className="btn" onClick={onManageStyles} title="Gérer les styles et leurs couleurs">
+              🎨 Styles
+            </button>
+            <button className="btn" onClick={onExport} title="Télécharger bands.json à committer">
+              ⬇ Export
+            </button>
+            <button className="btn" onClick={() => fileRef.current?.click()} title="Charger un bands.json">
+              ⬆ Import
+            </button>
+            <button className="btn" onClick={onResetPositions} title="Remettre les cartes aux positions du serveur">
+              ⤺ Positions
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="application/json"
+              hidden
+              onChange={(e) => {
+                handleFile(e.target.files?.[0])
+                e.target.value = ''
+              }}
+            />
+          </>
+        )}
       </div>
     </header>
   )

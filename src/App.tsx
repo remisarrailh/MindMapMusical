@@ -24,7 +24,7 @@ const nodeTypes = { band: BandNode }
 
 export default function App() {
   const store = useBandStore()
-  const [selected, setSelected] = useState<Band | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [initialVideo, setInitialVideo] = useState<number | null>(null)
   const [editing, setEditing] = useState<Band | null>(null)
   const [showForm, setShowForm] = useState(false)
@@ -33,13 +33,17 @@ export default function App() {
   const [styleFilter, setStyleFilter] = useState<string | null>(null)
   const [droppedId, setDroppedId] = useState<string | null>(null)
 
+  // Le groupe sélectionné est résolu par id depuis les données courantes
+  // (reste synchro avec le mode lecture/édition et les éditions).
+  const selected = selectedId ? store.bands.find((b) => b.id === selectedId) ?? null : null
+
   const openDetail = useCallback((band: Band) => {
-    setSelected(band)
+    setSelectedId(band.id)
     setInitialVideo(null)
   }, [])
 
   const playBand = useCallback((band: Band) => {
-    setSelected(band)
+    setSelectedId(band.id)
     setInitialVideo(0)
   }, [])
 
@@ -92,19 +96,32 @@ export default function App() {
     store.upsertBand(band)
     setShowForm(false)
     setEditing(null)
-    setSelected(band)
+    setSelectedId(band.id)
     setInitialVideo(null)
   }
 
   const handleDelete = (band: Band) => {
     if (!confirm(`Supprimer « ${band.name} » ?`)) return
     store.deleteBand(band.id)
-    setSelected(null)
+    setSelectedId(null)
   }
 
   const handleImport = (db: BandDatabase) => {
     store.importDatabase(db)
-    setSelected(null)
+    setSelectedId(null)
+  }
+
+  const handleDiscard = () => {
+    if (confirm('Jeter ton brouillon de contenu local et revenir à la version serveur ?')) {
+      store.discardDraft()
+      setSelectedId(null)
+    }
+  }
+
+  const handleResetPositions = () => {
+    if (confirm('Réinitialiser toutes les positions des cartes (selon la version serveur) ?')) {
+      store.resetPositions()
+    }
   }
 
   if (store.error) {
@@ -124,6 +141,8 @@ export default function App() {
         onSearch={setSearch}
         styleFilter={styleFilter}
         onStyleFilter={setStyleFilter}
+        editMode={store.editMode}
+        onToggleEdit={() => store.setEditMode(!store.editMode)}
         onAdd={() => {
           setEditing(null)
           setShowForm(true)
@@ -131,10 +150,19 @@ export default function App() {
         onManageStyles={() => setShowStyles(true)}
         onExport={store.exportJson}
         onImport={handleImport}
-        onReset={store.resetLocal}
-        hasUnexported={store.hasUnexported}
+        onResetPositions={handleResetPositions}
         count={store.bands.length}
       />
+
+      {store.draftDiffers && (
+        <div className="draft-banner">
+          <span>⚠️ Tu as des modifications de contenu locales <strong>non exportées</strong> (différentes du serveur).</span>
+          <div className="draft-banner-actions">
+            <button className="btn btn-sm btn-primary" onClick={store.exportJson}>⬇ Exporter</button>
+            <button className="btn btn-sm" onClick={handleDiscard}>🗑 Jeter le brouillon</button>
+          </div>
+        </div>
+      )}
 
       <div className="canvas">
         <ReactFlowProvider>
@@ -145,7 +173,7 @@ export default function App() {
             onNodesChange={onNodesChange}
             onNodeDragStop={onNodeDragStop}
             onNodeClick={onNodeClick}
-            onPaneClick={() => setSelected(null)}
+            onPaneClick={() => setSelectedId(null)}
             minZoom={0.1}
             maxZoom={2}
             fitView
@@ -163,12 +191,13 @@ export default function App() {
             band={selected}
             styles={store.styles}
             initialVideo={initialVideo}
+            editable={store.editMode}
             onEdit={(b) => {
               setEditing(b)
               setShowForm(true)
             }}
             onDelete={handleDelete}
-            onClose={() => setSelected(null)}
+            onClose={() => setSelectedId(null)}
           />
         )}
       </div>

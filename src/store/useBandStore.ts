@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Band, BandDatabase, Position, Style } from '../types'
 import {
-  clearOverrides,
-  hasUnexportedChanges,
-  loadOverrides,
-  markExported,
-  mergeDatabase,
-  saveOverrides,
+  applyPositions,
+  clearDraft,
+  clearPositions,
+  contentSignature,
+  loadDraft,
+  loadPositions,
+  type PositionMap,
+  savePositions,
+  saveDraft,
 } from './persistence'
 
 const DATA_URL = `${import.meta.env.BASE_URL}data/bands.json`
@@ -21,46 +24,61 @@ export function newId(): string {
 export interface BandStore {
   loading: boolean
   error: string | null
+  /** Données affichées : contenu (serveur, ou brouillon en édition) + positions locales. */
   styles: Style[]
   bands: Band[]
+
+  editMode: boolean
+  setEditMode: (b: boolean) => void
+
+  /** Un brouillon de contenu local existe et diffère du serveur. */
+  draftDiffers: boolean
+
+  // Édition de contenu (n'a de sens qu'en mode édition ; écrit dans le brouillon).
   upsertBand: (band: Band) => void
   deleteBand: (id: string) => void
-  moveBand: (id: string, position: Position) => void
   addStyle: (style: Style) => void
   updateStyle: (id: string, patch: Partial<Omit<Style, 'id'>>) => void
-  /** Supprime un style et le retire des groupes qui le référencent. */
   deleteStyle: (id: string) => void
-  /** Télécharge le JSON fusionné complet (à committer sur GitHub). */
+
+  // Positions : priorité locale, toujours sauvegardées (lecture comme édition).
+  moveBand: (id: string, position: Position) => void
+  resetPositions: () => void
+
+  // Synchronisation.
   exportJson: () => void
-  /** Réinjecte un fichier bands.json importé. */
   importDatabase: (db: BandDatabase) => void
-  /** Vide la couche localStorage (après commit du JSON exporté). */
-  resetLocal: () => void
-  hasUnexported: boolean
+  /** Jette le brouillon de contenu local → retour à la version serveur. */
+  discardDraft: () => void
 }
 
 export function useBandStore(): BandStore {
-  const [base, setBase] = useState<BandDatabase | null>(null)
-  const [db, setDb] = useState<BandDatabase | null>(null)
+  const [server, setServer] = useState<BandDatabase | null>(null)
+  const [draft, setDraft] = useState<BandDatabase | null>(null)
+  const [positions, setPositions] = useState<PositionMap>({})
+  const [editMode, setEditMode] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [hasUnexported, setHasUnexported] = useState(false)
 
-  // Chargement initial : JSON committé + merge overrides locaux.
+  // Chargement initial : serveur (anti-cache) + couches locales.
   useEffect(() => {
     let cancelled = false
-    // Anti-cache : le JSON est la "mémoire vivante" et change à chaque mise à
-    // jour. Sans ça, le navigateur / le CDN GitHub Pages sert une version périmée.
+    setPositions(loadPositions())
     fetch(`${DATA_URL}?_=${Date.now()}`, { cache: 'no-store' })
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<BandDatabase>
       })
-      .then((baseDb) => {
+      .then((srv) => {
         if (cancelled) return
-        setBase(baseDb)
-        const merged = mergeDatabase(baseDb, loadOverrides())
-        setDb(merged)
-        setHasUnexported(hasUnexportedChanges())
+        setServer(srv)
+        // Le brouillon redevient inutile s'il est identique au serveur (post-commit).
+        const d = loadDraft()
+        if (d && contentSignature(d) === contentSignature(srv)) {
+          clearDraft()
+          setDraft(null)
+        } else {
+          setDraft(d)
+        }
       })
       .catch((e) => {
         if (!cancelled) setError(String(e))
@@ -70,140 +88,163 @@ export function useBandStore(): BandStore {
     }
   }, [])
 
-  // Persiste toute mutation dans le localStorage.
-  const commit = useCallback((next: BandDatabase) => {
-    setDb(next)
-    saveOverrides({ bands: next.bands, styles: next.styles })
-    setHasUnexported(true)
-  }, [])
+  // Contenu de référence affiché : brouillon en édition, sinon serveur.
+  const content = editMode ? draft ?? server : server
 
-  const upsertBand = useCallback(
-    (band: Band) => {
-      setDb((cur) => {
-        if (!cur) return cur
-        const exists = cur.bands.some((b) => b.id === band.id)
-        const bands = exists
-          ? cur.bands.map((b) => (b.id === band.id ? band : b))
-          : [...cur.bands, band]
-        const next = { ...cur, bands }
-        saveOverrides({ bands: next.bands, styles: next.styles })
-        setHasUnexported(true)
+  const draftDiffers = useMemo(
+    () => !!(draft && server && contentSignature(draft) !== contentSignature(server)),
+    [draft, server],
+  )
+
+  // Applique une mutation de contenu sur le brouillon (créé depuis le serveur au besoin).
+  const editContent = useCallback(
+    (mutate: (d: BandDatabase) => BandDatabase) => {
+      setDraft((cur) => {
+        const base = cur ?? (server ? structuredClone(server) : null)
+        if (!base) return cur
+        const next = mutate(base)
+        saveDraft(next)
         return next
       })
     },
-    [],
+    [server],
   )
 
-  const deleteBand = useCallback((id: string) => {
-    setDb((cur) => {
-      if (!cur) return cur
-      const next = { ...cur, bands: cur.bands.filter((b) => b.id !== id) }
-      saveOverrides({ bands: next.bands, styles: next.styles })
-      setHasUnexported(true)
-      return next
-    })
-  }, [])
+  const upsertBand = useCallback(
+    (band: Band) =>
+      editContent((d) => {
+        const exists = d.bands.some((b) => b.id === band.id)
+        return {
+          ...d,
+          bands: exists ? d.bands.map((b) => (b.id === band.id ? band : b)) : [...d.bands, band],
+        }
+      }),
+    [editContent],
+  )
 
-  const moveBand = useCallback((id: string, position: Position) => {
-    setDb((cur) => {
-      if (!cur) return cur
-      const next = {
-        ...cur,
-        bands: cur.bands.map((b) => (b.id === id ? { ...b, position } : b)),
-      }
-      saveOverrides({ bands: next.bands, styles: next.styles })
-      setHasUnexported(true)
-      return next
-    })
-  }, [])
+  const deleteBand = useCallback(
+    (id: string) => {
+      editContent((d) => ({ ...d, bands: d.bands.filter((b) => b.id !== id) }))
+      setPositions((cur) => {
+        if (!cur[id]) return cur
+        const next = { ...cur }
+        delete next[id]
+        savePositions(next)
+        return next
+      })
+    },
+    [editContent],
+  )
 
-  const addStyle = useCallback((style: Style) => {
-    setDb((cur) => {
-      if (!cur) return cur
-      if (cur.styles.some((s) => s.id === style.id)) return cur
-      const next = { ...cur, styles: [...cur.styles, style] }
-      saveOverrides({ bands: next.bands, styles: next.styles })
-      setHasUnexported(true)
-      return next
-    })
-  }, [])
+  const addStyle = useCallback(
+    (style: Style) =>
+      editContent((d) =>
+        d.styles.some((s) => s.id === style.id) ? d : { ...d, styles: [...d.styles, style] },
+      ),
+    [editContent],
+  )
 
-  const updateStyle = useCallback((id: string, patch: Partial<Omit<Style, 'id'>>) => {
-    setDb((cur) => {
-      if (!cur) return cur
-      const next = {
-        ...cur,
-        styles: cur.styles.map((s) => (s.id === id ? { ...s, ...patch } : s)),
-      }
-      saveOverrides({ bands: next.bands, styles: next.styles })
-      setHasUnexported(true)
-      return next
-    })
-  }, [])
+  const updateStyle = useCallback(
+    (id: string, patch: Partial<Omit<Style, 'id'>>) =>
+      editContent((d) => ({
+        ...d,
+        styles: d.styles.map((s) => (s.id === id ? { ...s, ...patch } : s)),
+      })),
+    [editContent],
+  )
 
-  const deleteStyle = useCallback((id: string) => {
-    setDb((cur) => {
-      if (!cur) return cur
-      const next = {
-        ...cur,
-        styles: cur.styles.filter((s) => s.id !== id),
-        bands: cur.bands.map((b) =>
+  const deleteStyle = useCallback(
+    (id: string) =>
+      editContent((d) => ({
+        ...d,
+        styles: d.styles.filter((s) => s.id !== id),
+        bands: d.bands.map((b) =>
           b.styles.includes(id) ? { ...b, styles: b.styles.filter((x) => x !== id) } : b,
         ),
-      }
-      saveOverrides({ bands: next.bands, styles: next.styles })
-      setHasUnexported(true)
+      })),
+    [editContent],
+  )
+
+  // Positions : priorité locale, indépendantes du brouillon de contenu.
+  const moveBand = useCallback((id: string, position: Position) => {
+    setPositions((cur) => {
+      const next = { ...cur, [id]: position }
+      savePositions(next)
       return next
     })
+  }, [])
+
+  const resetPositions = useCallback(() => {
+    clearPositions()
+    setPositions({})
   }, [])
 
   const exportJson = useCallback(() => {
-    if (!db) return
-    const payload: BandDatabase = {
-      version: db.version,
-      styles: db.styles,
-      bands: db.bands,
-    }
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {
-      type: 'application/json',
-    })
+    const base = draft ?? server
+    if (!base) return
+    // Export = contenu courant + positions locales fusionnées (pour committer le layout).
+    const payload = applyPositions(base, positions)
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
     a.download = 'bands.json'
     a.click()
     URL.revokeObjectURL(url)
-    markExported()
-    setHasUnexported(false)
-  }, [db])
+  }, [draft, server, positions])
 
   const importDatabase = useCallback((imported: BandDatabase) => {
-    commit(imported)
-  }, [commit])
+    setDraft(imported)
+    saveDraft(imported)
+    setEditMode(true)
+  }, [])
 
-  const resetLocal = useCallback(() => {
-    clearOverrides()
-    if (base) setDb(base)
-    setHasUnexported(false)
-  }, [base])
+  const discardDraft = useCallback(() => {
+    clearDraft()
+    setDraft(null)
+  }, [])
+
+  const display = useMemo(
+    () => (content ? applyPositions(content, positions) : null),
+    [content, positions],
+  )
 
   return useMemo(
     () => ({
-      loading: db === null && error === null,
+      loading: server === null && error === null,
       error,
-      styles: db?.styles ?? [],
-      bands: db?.bands ?? [],
+      styles: display?.styles ?? [],
+      bands: display?.bands ?? [],
+      editMode,
+      setEditMode,
+      draftDiffers,
       upsertBand,
       deleteBand,
-      moveBand,
       addStyle,
       updateStyle,
       deleteStyle,
+      moveBand,
+      resetPositions,
       exportJson,
       importDatabase,
-      resetLocal,
-      hasUnexported,
+      discardDraft,
     }),
-    [db, error, upsertBand, deleteBand, moveBand, addStyle, updateStyle, deleteStyle, exportJson, importDatabase, resetLocal, hasUnexported],
+    [
+      server,
+      error,
+      display,
+      editMode,
+      draftDiffers,
+      upsertBand,
+      deleteBand,
+      addStyle,
+      updateStyle,
+      deleteStyle,
+      moveBand,
+      resetPositions,
+      exportJson,
+      importDatabase,
+      discardDraft,
+    ],
   )
 }
