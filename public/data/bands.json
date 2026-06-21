@@ -81,34 +81,13 @@
       }
     },
     {
-      "id": "oth",
-      "name": "OTH",
-      "logo": "",
-      "styles": [
-        "punk"
-      ],
-      "info": "Groupe de punk rock montpelliérain culte (1978–1991). L'une des références mythiques du punk rock francophone, figure majeure de la scène alternative locale.",
-      "videos": [],
-      "links": [
-        {
-          "label": "▶ Écouter sur YouTube",
-          "url": "https://www.youtube.com/results?search_query=OTH+punk+Montpellier"
-        }
-      ],
-      "concertsUrl": "",
-      "position": {
-        "x": 60,
-        "y": 160
-      }
-    },
-    {
       "id": "les-sheriff",
       "name": "Les Sheriff",
       "logo": "",
       "styles": [
         "punk"
       ],
-      "info": "Punk rock énergique de Montpellier (1984–1998). Réputés pour leurs concerts ultra-rapides et leur intensité scénique, autre pilier du punk rock français.",
+      "info": "Punk rock énergique de Montpellier (formé en 1984), réputé pour ses concerts ultra-rapides. Séparé en 1999 puis reformé : nouvel album « Grand bombardement tardif » (2021) et dates en 2022.",
       "videos": [],
       "links": [
         {
@@ -118,28 +97,7 @@
       ],
       "concertsUrl": "",
       "position": {
-        "x": 400,
-        "y": 160
-      }
-    },
-    {
-      "id": "les-vierges",
-      "name": "Les Vierges",
-      "logo": "",
-      "styles": [
-        "punk"
-      ],
-      "info": "Groupe de punk rock de Montpellier, considéré (avec OTH et Les Sheriff) comme l'une des trois références punk locales. Encore actif sur scène autour de 2015.",
-      "videos": [],
-      "links": [
-        {
-          "label": "▶ Écouter sur YouTube",
-          "url": "https://www.youtube.com/results?search_query=Les+Vierges+punk+Montpellier"
-        }
-      ],
-      "concertsUrl": "",
-      "position": {
-        "x": 740,
+        "x": 60,
         "y": 160
       }
     },
@@ -151,7 +109,7 @@
         "rock",
         "electro"
       ],
-      "info": "Duo electro-rock de Montpellier formé par Jean-Philippe Freu et Patrice Carrié. Mélange guitares rock et électronique, succès international à la fin des années 90 / 2000s.",
+      "info": "Duo electro-rock de Montpellier (Jean-Philippe Freu & Patrice Carrié), mélange guitares et électronique. Toujours actif : album « Psychoanalysis » (2024) et tournée 2025.",
       "videos": [],
       "links": [
         {
@@ -161,50 +119,8 @@
       ],
       "concertsUrl": "",
       "position": {
-        "x": 1080,
-        "y": 160
-      }
-    },
-    {
-      "id": "marvin",
-      "name": "Marvin",
-      "logo": "",
-      "styles": [
-        "rock"
-      ],
-      "info": "Groupe instrumental de math rock / noise rock de Montpellier. Compositions complexes et énergiques, scène rock indé.",
-      "videos": [],
-      "links": [
-        {
-          "label": "▶ Écouter sur YouTube",
-          "url": "https://www.youtube.com/results?search_query=Marvin+math+rock+Montpellier"
-        }
-      ],
-      "concertsUrl": "",
-      "position": {
-        "x": 60,
-        "y": 400
-      }
-    },
-    {
-      "id": "drive-blind",
-      "name": "Drive Blind",
-      "logo": "",
-      "styles": [
-        "rock"
-      ],
-      "info": "Groupe de noise rock / shoegaze de Montpellier (années 90). Murs de guitares saturées, l'un des noms marquants du rock alternatif local.",
-      "videos": [],
-      "links": [
-        {
-          "label": "▶ Écouter sur YouTube",
-          "url": "https://www.youtube.com/results?search_query=Drive+Blind+noise+rock"
-        }
-      ],
-      "concertsUrl": "",
-      "position": {
         "x": 400,
-        "y": 400
+        "y": 160
       }
     },
     {
@@ -225,7 +141,7 @@
       "concertsUrl": "",
       "position": {
         "x": 740,
-        "y": 400
+        "y": 160
       }
     },
     {
@@ -237,7 +153,7 @@
         "jazz",
         "chanson"
       ],
-      "info": "Trio atypique de Montpellier fusionnant jazz, rock, chanson française et slam. Mené par Nicolas Larossi (chant/violoncelle). Coup de cœur de l'Académie Charles Cros pour l'album Renverser.",
+      "info": "Groupe de Montpellier fusionnant jazz, rock, chanson française et slam, mené par Nicolas Larossi. Très actif : album « Ce que nous sommes » (2025) et tournée en cours.",
       "videos": [],
       "links": [
         {
@@ -248,7 +164,7 @@
       "concertsUrl": "",
       "position": {
         "x": 1080,
-        "y": 400
+        "y": 160
       }
     }
   ]
