@@ -48,7 +48,9 @@ export function useBandStore(): BandStore {
   // Chargement initial : JSON committé + merge overrides locaux.
   useEffect(() => {
     let cancelled = false
-    fetch(DATA_URL)
+    // Anti-cache : le JSON est la "mémoire vivante" et change à chaque mise à
+    // jour. Sans ça, le navigateur / le CDN GitHub Pages sert une version périmée.
+    fetch(`${DATA_URL}?_=${Date.now()}`, { cache: 'no-store' })
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<BandDatabase>
