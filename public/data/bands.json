@@ -79,6 +79,177 @@
         "x": 507.99999999999994,
         "y": -114.99999999999997
       }
+    },
+    {
+      "id": "oth",
+      "name": "OTH",
+      "logo": "",
+      "styles": [
+        "punk"
+      ],
+      "info": "Groupe de punk rock montpelliérain culte (1978–1991). L'une des références mythiques du punk rock francophone, figure majeure de la scène alternative locale.",
+      "videos": [],
+      "links": [
+        {
+          "label": "▶ Écouter sur YouTube",
+          "url": "https://www.youtube.com/results?search_query=OTH+punk+Montpellier"
+        }
+      ],
+      "concertsUrl": "",
+      "position": {
+        "x": 60,
+        "y": 160
+      }
+    },
+    {
+      "id": "les-sheriff",
+      "name": "Les Sheriff",
+      "logo": "",
+      "styles": [
+        "punk"
+      ],
+      "info": "Punk rock énergique de Montpellier (1984–1998). Réputés pour leurs concerts ultra-rapides et leur intensité scénique, autre pilier du punk rock français.",
+      "videos": [],
+      "links": [
+        {
+          "label": "▶ Écouter sur YouTube",
+          "url": "https://www.youtube.com/results?search_query=Les+Sheriff+punk+rock"
+        }
+      ],
+      "concertsUrl": "",
+      "position": {
+        "x": 400,
+        "y": 160
+      }
+    },
+    {
+      "id": "les-vierges",
+      "name": "Les Vierges",
+      "logo": "",
+      "styles": [
+        "punk"
+      ],
+      "info": "Groupe de punk rock de Montpellier, considéré (avec OTH et Les Sheriff) comme l'une des trois références punk locales. Encore actif sur scène autour de 2015.",
+      "videos": [],
+      "links": [
+        {
+          "label": "▶ Écouter sur YouTube",
+          "url": "https://www.youtube.com/results?search_query=Les+Vierges+punk+Montpellier"
+        }
+      ],
+      "concertsUrl": "",
+      "position": {
+        "x": 740,
+        "y": 160
+      }
+    },
+    {
+      "id": "rinocerose",
+      "name": "Rinôçérôse",
+      "logo": "",
+      "styles": [
+        "rock",
+        "electro"
+      ],
+      "info": "Duo electro-rock de Montpellier formé par Jean-Philippe Freu et Patrice Carrié. Mélange guitares rock et électronique, succès international à la fin des années 90 / 2000s.",
+      "videos": [],
+      "links": [
+        {
+          "label": "▶ Écouter sur YouTube",
+          "url": "https://www.youtube.com/results?search_query=Rinocerose+band"
+        }
+      ],
+      "concertsUrl": "",
+      "position": {
+        "x": 1080,
+        "y": 160
+      }
+    },
+    {
+      "id": "marvin",
+      "name": "Marvin",
+      "logo": "",
+      "styles": [
+        "rock"
+      ],
+      "info": "Groupe instrumental de math rock / noise rock de Montpellier. Compositions complexes et énergiques, scène rock indé.",
+      "videos": [],
+      "links": [
+        {
+          "label": "▶ Écouter sur YouTube",
+          "url": "https://www.youtube.com/results?search_query=Marvin+math+rock+Montpellier"
+        }
+      ],
+      "concertsUrl": "",
+      "position": {
+        "x": 60,
+        "y": 400
+      }
+    },
+    {
+      "id": "drive-blind",
+      "name": "Drive Blind",
+      "logo": "",
+      "styles": [
+        "rock"
+      ],
+      "info": "Groupe de noise rock / shoegaze de Montpellier (années 90). Murs de guitares saturées, l'un des noms marquants du rock alternatif local.",
+      "videos": [],
+      "links": [
+        {
+          "label": "▶ Écouter sur YouTube",
+          "url": "https://www.youtube.com/results?search_query=Drive+Blind+noise+rock"
+        }
+      ],
+      "concertsUrl": "",
+      "position": {
+        "x": 400,
+        "y": 400
+      }
+    },
+    {
+      "id": "kursed",
+      "name": "Kursed",
+      "logo": "",
+      "styles": [
+        "rock"
+      ],
+      "info": "Rock alternatif aux influences grunge et blues. Fondé en 2003 (membres alors âgés de 13 ans), mené par Hugo Herleman (chant/guitare). Album Misophone en 2017, repérés par Les Inrockuptibles et Canal+.",
+      "videos": [],
+      "links": [
+        {
+          "label": "▶ Écouter sur YouTube",
+          "url": "https://www.youtube.com/results?search_query=Kursed+Misophone"
+        }
+      ],
+      "concertsUrl": "",
+      "position": {
+        "x": 740,
+        "y": 400
+      }
+    },
+    {
+      "id": "iaross",
+      "name": "iaross",
+      "logo": "",
+      "styles": [
+        "rock",
+        "jazz",
+        "chanson"
+      ],
+      "info": "Trio atypique de Montpellier fusionnant jazz, rock, chanson française et slam. Mené par Nicolas Larossi (chant/violoncelle). Coup de cœur de l'Académie Charles Cros pour l'album Renverser.",
+      "videos": [],
+      "links": [
+        {
+          "label": "▶ Écouter sur YouTube",
+          "url": "https://www.youtube.com/results?search_query=iaross+groupe"
+        }
+      ],
+      "concertsUrl": "",
+      "position": {
+        "x": 1080,
+        "y": 400
+      }
     }
   ]
 }
