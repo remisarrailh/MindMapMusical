@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "styles": [
+    { "id": "rock", "label": "Rock", "color": "#e63946" },
+    { "id": "metal", "label": "Metal", "color": "#1d3557" },
+    { "id": "punk", "label": "Punk", "color": "#f4a261" },
+    { "id": "electro", "label": "Électro", "color": "#9b5de5" },
+    { "id": "jazz", "label": "Jazz / Fusion", "color": "#2a9d8f" },
+    { "id": "chanson", "label": "Chanson / Folk", "color": "#e9c46a" }
+  ],
+  "bands": [
+    {
+      "id": "seed-exemple-1",
+      "name": "Groupe Exemple",
+      "logo": "",
+      "styles": ["rock"],
+      "info": "Remplace-moi ! Ceci est un groupe d'exemple. Chant: …, Guitare: …, Basse: …, Batterie: …",
+      "videos": [
+        { "title": "Exemple live", "youtubeId": "dQw4w9WgXcQ" }
+      ],
+      "links": [
+        { "label": "Bandcamp", "url": "https://bandcamp.com" }
+      ],
+      "concertsUrl": "",
+      "position": { "x": 120, "y": 120 }
+    },
+    {
+      "id": "seed-exemple-2",
+      "name": "Autre Exemple Metal",
+      "logo": "",
+      "styles": ["metal"],
+      "info": "Deuxième groupe d'exemple pour illustrer un autre cluster de style.",
+      "videos": [],
+      "links": [],
+      "concertsUrl": "",
+      "position": { "x": 480, "y": 120 }
+    }
+  ]
+}

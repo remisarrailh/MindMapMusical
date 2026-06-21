@@ -1,0 +1,244 @@
+:root {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --panel-2: #1f242e;
+  --border: #2c3340;
+  --text: #e6e9ef;
+  --text-dim: #9aa3b2;
+  --accent: #06d6a0;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ---------- Toolbar ---------- */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.toolbar-brand { display: flex; align-items: baseline; gap: 8px; font-size: 18px; }
+.toolbar-sub { color: var(--text-dim); font-size: 12px; }
+.toolbar-controls { display: flex; gap: 8px; flex: 1; min-width: 220px; }
+.toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.search, .style-filter, .field input, .field textarea, .logo-url, .inline-add input {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  font-family: inherit;
+}
+.search { flex: 1; min-width: 140px; }
+
+.btn {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.btn:hover { border-color: var(--accent); }
+.btn-primary { background: var(--accent); color: #04201a; border-color: var(--accent); font-weight: 600; }
+.btn-danger { color: #ff7b7b; border-color: #5a2b2b; }
+.btn-sm { padding: 6px 10px; font-size: 13px; }
+.icon-btn { background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 16px; }
+.icon-btn:hover { color: var(--text); }
+.link-btn { background: none; border: none; color: var(--accent); cursor: pointer; padding: 0; font-size: 13px; }
+
+/* ---------- Canvas ---------- */
+.canvas { position: relative; flex: 1; min-height: 0; }
+.react-flow { background: var(--bg); }
+
+/* ---------- Cluster node ---------- */
+.cluster {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+}
+.cluster-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  font-weight: 700;
+  font-size: 16px;
+}
+.cluster-dot { width: 12px; height: 12px; border-radius: 50%; }
+.cluster-count {
+  margin-left: auto;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* ---------- Band node ---------- */
+.band-node {
+  width: 280px;
+  min-height: 134px;
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  cursor: grab;
+  position: relative;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  transform-origin: center;
+  transition: transform 180ms cubic-bezier(0.2, 0.8, 0.25, 1), box-shadow 180ms ease;
+  will-change: transform;
+}
+.band-node:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45); }
+.band-node--selected { box-shadow: 0 0 0 2px var(--accent), 0 8px 20px rgba(0, 0, 0, 0.4); }
+
+/* La carte attrapée se soulève, grandit et s'incline légèrement. */
+.react-flow__node.dragging { z-index: 1000 !important; }
+.react-flow__node.dragging .band-node {
+  cursor: grabbing;
+  transform: scale(1.07) rotate(-2deg);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.6);
+  border-color: var(--accent);
+}
+/* Rebond quand on la pose. */
+@keyframes drop-bounce {
+  0% { transform: scale(1.07) rotate(-2deg); }
+  45% { transform: scale(0.95) rotate(0.5deg); }
+  75% { transform: scale(1.02); }
+  100% { transform: scale(1) rotate(0); }
+}
+.band-node--dropped { animation: drop-bounce 360ms cubic-bezier(0.2, 0.8, 0.25, 1); }
+.band-logo {
+  width: 72px; height: 72px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 24px;
+  overflow: hidden;
+}
+.band-logo img { width: 100%; height: 100%; object-fit: cover; }
+.band-body { flex: 1; min-width: 0; }
+.band-name { font-weight: 700; font-size: 18px; line-height: 1.25; word-break: break-word; }
+.band-styles { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.band-style-pill {
+  font-size: 12px; color: var(--text-dim);
+  border: 1px solid var(--border); border-radius: 9px; padding: 2px 8px;
+}
+.band-play {
+  position: absolute; right: 12px; bottom: 12px;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: none; color: #fff; cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ---------- Detail panel ---------- */
+.panel {
+  position: absolute; top: 0; right: 0; bottom: 0;
+  width: 360px; max-width: 90vw;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  padding: 16px; overflow-y: auto;
+  z-index: 5;
+}
+.panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.panel-head h2 { margin: 0; font-size: 20px; }
+.panel-styles { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.pill { font-size: 12px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 2px 8px; }
+.panel-logo { width: 100%; max-height: 160px; object-fit: contain; border-radius: 10px; margin: 8px 0; background: var(--panel-2); }
+.panel-info { color: var(--text); white-space: pre-wrap; line-height: 1.5; font-size: 14px; }
+.panel-section { margin-top: 16px; }
+.panel-section h3 { font-size: 13px; text-transform: uppercase; color: var(--text-dim); margin: 0 0 8px; }
+.panel-videos { display: flex; flex-direction: column; gap: 12px; }
+.panel-video-title { font-size: 13px; margin-bottom: 4px; color: var(--text-dim); }
+.panel-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.panel-links a { color: var(--accent); }
+.concerts-btn {
+  display: inline-block; background: var(--panel-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px; color: var(--text); text-decoration: none;
+}
+.panel-actions { display: flex; gap: 8px; margin-top: 20px; }
+
+/* ---------- YouTube ---------- */
+.yt-frame, .yt-thumb { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 8px; overflow: hidden; border: none; padding: 0; cursor: pointer; background: #000; }
+.yt-frame iframe { width: 100%; height: 100%; border: 0; }
+.yt-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.yt-play {
+  position: absolute; inset: 0; margin: auto; width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.6); border-radius: 50%; color: #fff; font-size: 18px;
+}
+
+/* ---------- Modal / form ---------- */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center; z-index: 20; padding: 20px;
+}
+.modal {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+  width: 560px; max-width: 100%; max-height: 90vh; display: flex; flex-direction: column;
+}
+.modal-head { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); }
+.modal-head h2 { margin: 0; font-size: 18px; }
+.modal-body { padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; padding: 16px; border-top: 1px solid var(--border); }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > span { font-size: 13px; color: var(--text-dim); }
+.logo-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.logo-preview { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; }
+.style-picker { display: flex; flex-wrap: wrap; gap: 6px; }
+.style-chip { background: var(--panel-2); border: 1px solid var(--border); border-radius: 16px; padding: 4px 12px; cursor: pointer; color: var(--text); font-size: 13px; }
+.style-chip--on { font-weight: 600; }
+.inline-add { display: flex; gap: 6px; margin-top: 6px; }
+.inline-add input { flex: 1; }
+.chip-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.chip-list li { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--panel-2); border-radius: 8px; padding: 6px 10px; font-size: 13px; }
+
+/* ---------- Style manager ---------- */
+.style-manager-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.style-manager-row { display: flex; align-items: center; gap: 10px; }
+.color-input {
+  width: 38px; height: 38px; padding: 0; border: 1px solid var(--border);
+  border-radius: 8px; background: var(--panel-2); cursor: pointer; flex-shrink: 0;
+}
+.style-label-input {
+  flex: 1;
+  background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
+  border-radius: 8px; padding: 8px 10px; font-size: 14px; font-family: inherit;
+}
+.style-count {
+  min-width: 28px; text-align: center; font-size: 12px; color: var(--text-dim);
+  background: var(--panel-2); border-radius: 10px; padding: 4px 8px;
+}
+.style-empty { color: var(--text-dim); font-size: 14px; }
+
+.loading { position: absolute; top: 70px; left: 16px; background: var(--panel); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); }
+.fatal { padding: 40px; }
+.fatal code { background: var(--panel-2); padding: 2px 6px; border-radius: 4px; }
+
+/* React Flow dark tweaks */
+.react-flow__controls button { background: var(--panel-2); border-bottom: 1px solid var(--border); color: var(--text); fill: var(--text); }
+.react-flow__minimap { background: var(--panel); }
+.react-flow__attribution { display: none; }
